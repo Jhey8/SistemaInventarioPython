@@ -25,6 +25,11 @@ def crear_app():
     app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
     app.secret_key = SECRET_KEY
 
+    try:
+        sembrar_datos_si_vacio()
+    except Exception:
+        logger.error("No se pudieron sembrar los datos iniciales", exc_info=True)
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(modulo_bp)
     app.register_blueprint(perfil_bp)
@@ -53,7 +58,6 @@ def crear_app():
     return app
 
 if __name__ == "__main__":
-    sembrar_datos_si_vacio()
     aplicacion = crear_app()
     print(f"Servidor en http://localhost:{PUERTO}")
     aplicacion.run(host="0.0.0.0", port=PUERTO, debug=True)
