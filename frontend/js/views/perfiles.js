@@ -27,8 +27,8 @@ export async function init() {
         else if (boton.dataset.accion === "eliminar") eliminar(id);
     });
 
-    await cargarModulos();
-    await cargar();
+    await Promise.all([cargarModulos(), cargar()]);
+    pintarResumen();
 }
 
 async function cargar() {

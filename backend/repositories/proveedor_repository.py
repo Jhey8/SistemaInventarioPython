@@ -29,6 +29,19 @@ class ProveedorRepository:
             cursor.close()
             conn.close()
 
+    def buscar_por_ruc(self, ruc):
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute(
+                "SELECT * FROM proveedores WHERE ruc = %s AND estado <> 2", (ruc,)
+            )
+            fila = cursor.fetchone()
+            return self._fila_a_proveedor(fila) if fila else None
+        finally:
+            cursor.close()
+            conn.close()
+
     def agregar(self, proveedor):
         conn = get_connection()
         try:

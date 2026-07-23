@@ -59,6 +59,48 @@ export function primerError(errores) {
     return errores.find((e) => e) || null;
 }
 
+const PREFIJOS_RUC = ["10", "15", "16", "17", "20"];
+const PESOS_RUC = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+
+/* RUC peruano: 11 digitos, prefijo valido y digito verificador (modulo 11). */
+export function ruc(valor, { obligatorio = false } = {}) {
+    valor = (valor || "").trim();
+    if (!valor) return obligatorio ? "El RUC es obligatorio." : null;
+    if (!PATRON_DIGITOS.test(valor) || valor.length !== 11) return "El RUC debe tener 11 dígitos.";
+    if (!PREFIJOS_RUC.includes(valor.slice(0, 2))) return "El RUC debe empezar con 10, 15, 16, 17 o 20.";
+    const suma = PESOS_RUC.reduce((acc, peso, i) => acc + Number(valor[i]) * peso, 0);
+    let verificador = 11 - (suma % 11);
+    if (verificador === 10) verificador = 0;
+    else if (verificador === 11) verificador = 1;
+    if (verificador !== Number(valor[10])) return "El RUC no es válido (dígito verificador incorrecto).";
+    return null;
+}
+
+export function telefono(valor, { obligatorio = false } = {}) {
+    valor = (valor || "").trim();
+    if (!valor) return obligatorio ? "El teléfono es obligatorio." : null;
+    if (!PATRON_DIGITOS.test(valor)) return "El teléfono solo admite números.";
+    if (valor.length !== 9) return "El teléfono debe tener 9 dígitos.";
+    return null;
+}
+
+export function hoyISO() {
+    return new Date().toISOString().slice(0, 10);
+}
+
+export function fechaNoPasada(valor, campo = "Fecha de vencimiento") {
+    if (!valor) return null;
+    if (valor < hoyISO()) return `El campo '${campo}' no puede ser una fecha pasada.`;
+    return null;
+}
+
+export function rangoFechas(desde, hasta) {
+    if (desde && hasta && desde > hasta) {
+        return "La fecha 'Desde' no puede ser mayor que 'Hasta'.";
+    }
+    return null;
+}
+
 export function filtrarEntrada(input, tipo) {
     const patrones = {
         texto: /[^A-Za-zÁÉÍÓÚÜáéíóúüÑñ .,'\-]/g,
@@ -68,5 +110,21 @@ export function filtrarEntrada(input, tipo) {
     input.addEventListener("input", () => {
         const limpio = input.value.replace(patrones[tipo], "");
         if (limpio !== input.value) input.value = limpio;
+    });
+}
+
+/* Campos numericos: impide teclear letras, signos (e, +, -) y pegar texto invalido. */
+export function soloNumero(input, permitirDecimal = false) {
+    if (!input) return;
+    const bloqueadas = permitirDecimal
+        ? ["e", "E", "+", "-", ","]
+        : ["e", "E", "+", "-", ",", "."];
+    input.addEventListener("keydown", (ev) => {
+        if (bloqueadas.includes(ev.key)) ev.preventDefault();
+    });
+    input.addEventListener("paste", (ev) => {
+        const texto = (ev.clipboardData || window.clipboardData).getData("text");
+        const patron = permitirDecimal ? /^\d*\.?\d*$/ : /^\d*$/;
+        if (!patron.test(texto)) ev.preventDefault();
     });
 }

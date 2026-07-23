@@ -94,10 +94,12 @@ export async function navegar(nombre) {
     }
     const contenido = document.getElementById("contenido");
     try {
-        const html = await fetch(`${ruta.html}?v=${V}`).then((r) => r.text());
+        const [html, modulo] = await Promise.all([
+            fetch(`${ruta.html}?v=${V}`).then((r) => r.text()),
+            import(`${ruta.js}?v=${V}`),
+        ]);
         contenido.innerHTML = html;
         mostrarCargaEnTablas(contenido);
-        const modulo = await import(`${ruta.js}?v=${V}`);
         if (modulo.init) await modulo.init();
         contenido.querySelectorAll(".fila-cargando").forEach((f) => f.remove());
         marcarActivo(nombre);

@@ -1,4 +1,4 @@
-from exceptions.errores import DatosInvalidosError
+import validadores
 
 class Categoria:
     def __init__(self, id, nombre, descripcion=None, estado=1):
@@ -9,8 +9,7 @@ class Categoria:
         self.validar()
 
     def validar(self):
-        if not self.nombre or not str(self.nombre).strip():
-            raise DatosInvalidosError("El nombre de la categoría es obligatorio.")
+        self.nombre = validadores.texto_general(self.nombre, "Nombre de la categoría", maximo=80)
 
     def to_dict(self):
         return {

@@ -27,7 +27,7 @@ class Proveedor:
         self.validar()
 
     def validar(self):
-        self.nombre_proveedor = validadores.texto_requerido(
+        self.nombre_proveedor = validadores.texto_general(
             self.nombre_proveedor, "Nombre del proveedor", maximo=200
         )
         self.ruc = validadores.solo_digitos(self.ruc, "RUC", longitud=LONGITUD_RUC)

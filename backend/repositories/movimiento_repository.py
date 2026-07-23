@@ -78,6 +78,18 @@ class MovimientoRepository:
             cursor.close()
             conn.close()
 
+    def contar_por_proveedor(self, id_proveedor):
+        conn = get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) FROM movimientos WHERE id_proveedor = %s", (id_proveedor,)
+            )
+            return cursor.fetchone()[0]
+        finally:
+            cursor.close()
+            conn.close()
+
     def listar(self, limite=100):
         return self.listar_filtrado({}, limite)
 

@@ -28,22 +28,20 @@ export async function init() {
 
 async function cargar() {
     try {
-        categorias = await CategoriasAPI.listar();
+        const [cats, productos] = await Promise.all([
+            CategoriasAPI.listar(),
+            InventarioAPI.opciones().catch(() => []),
+        ]);
         if (!document.getElementById("cuerpo-categorias")) return;
+        categorias = cats;
         render(categorias);
-        pintarResumen();
+        pintarResumen(productos);
     } catch (e) {
         notificar(e.message, "danger");
     }
 }
 
-async function pintarResumen() {
-    let productos = [];
-    try {
-        productos = await InventarioAPI.opciones();
-    } catch {
-        productos = [];
-    }
+function pintarResumen(productos) {
     const conProductos = new Set(productos.map((p) => p.categoria)).size;
     const conDescripcion = categorias.filter((c) => c.descripcion).length;
     const promedio = categorias.length

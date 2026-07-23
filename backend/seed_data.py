@@ -25,7 +25,7 @@ USUARIO_ADMIN = {
 PROVEEDORES = [
     {
         "nombre_proveedor": "Distribuidora Tecnológica SAC",
-        "ruc": "20123456781",
+        "ruc": "20123456786",
         "representante": "Juan Pérez",
         "telefono": "987654321",
         "correo": "ventas@distectec.pe",
@@ -33,7 +33,7 @@ PROVEEDORES = [
     },
     {
         "nombre_proveedor": "Importaciones del Sur EIRL",
-        "ruc": "20456789012",
+        "ruc": "20456789014",
         "representante": "María López",
         "telefono": "912345678",
         "correo": "contacto@impsur.pe",

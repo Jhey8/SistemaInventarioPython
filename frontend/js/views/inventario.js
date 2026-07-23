@@ -25,6 +25,8 @@ export async function init() {
     document.querySelectorAll('input[name="tipo"]').forEach((radio) =>
         radio.addEventListener("change", alCambiarTipo));
     document.getElementById("mov-motivo").addEventListener("change", actualizarBloques);
+    v.soloNumero(document.getElementById("mov-cantidad"));
+    v.soloNumero(document.getElementById("mov-precio"), true);
 
     document.getElementById("cuerpo-inventario").addEventListener("click", (e) => {
         const boton = e.target.closest("button[data-accion]");
@@ -34,8 +36,7 @@ export async function init() {
         else if (boton.dataset.accion === "historial") abrirHistorial(id);
     });
 
-    await llenarProveedores();
-    await cargar();
+    await Promise.all([llenarProveedores(), cargar()]);
 }
 
 async function cargar() {

@@ -1,3 +1,4 @@
+import validadores
 from models.producto import crear_producto
 from repositories.producto_repository import ProductoRepository
 from repositories.categoria_repository import CategoriaRepository
@@ -22,14 +23,21 @@ class InventarioService:
         return producto
 
     def crear_producto(self, datos):
-        producto = crear_producto(dict(datos))
+        datos = dict(datos)
+        validadores.fecha_no_pasada(datos.get("fecha_vencimiento"))
+        producto = crear_producto(datos)
         self._validar_categoria(producto.categoria_id)
         return self.repo.agregar(producto)
 
     def actualizar_producto(self, id, datos):
-        self.obtener_producto(id)
+        actual = self.obtener_producto(id)
         datos = dict(datos)
         datos["id"] = id
+        # Solo se exige fecha futura si el usuario la cambio (no bloquea editar
+        # un producto que ya estaba vencido).
+        nueva_fecha = datos.get("fecha_vencimiento")
+        if nueva_fecha and nueva_fecha != getattr(actual, "fecha_vencimiento", None):
+            validadores.fecha_no_pasada(nueva_fecha)
         producto = crear_producto(datos)
         self._validar_categoria(producto.categoria_id)
         return self.repo.actualizar(producto)

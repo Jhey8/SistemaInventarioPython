@@ -115,9 +115,9 @@ async function guardar() {
 
     const error = v.primerError([
         v.requerido(nombre, "Nombre"),
-        v.digitos(ruc, "RUC", { longitud: 11 }),
+        v.ruc(ruc),
         v.soloTexto(representante, "Representante", { obligatorio: false }),
-        v.digitos(telefono, "Teléfono"),
+        v.telefono(telefono),
         v.correo(correoValor),
     ]);
     if (error) return mostrarError(error);

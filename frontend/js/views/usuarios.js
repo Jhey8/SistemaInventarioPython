@@ -28,8 +28,7 @@ export async function init() {
         else if (boton.dataset.accion === "eliminar") eliminar(id);
     });
 
-    await cargarPerfiles();
-    await cargar();
+    await Promise.all([cargarPerfiles(), cargar()]);
 }
 
 async function cargar() {

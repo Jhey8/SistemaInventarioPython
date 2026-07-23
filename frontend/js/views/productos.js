@@ -16,6 +16,11 @@ export async function init() {
         guardar();
     });
 
+    v.soloNumero(document.getElementById("campo-cantidad"));
+    v.soloNumero(document.getElementById("campo-precio"), true);
+    v.soloNumero(document.getElementById("campo-minimo"));
+    document.getElementById("campo-vencimiento").min = v.hoyISO();
+
     document.getElementById("cuerpo-tabla").addEventListener("click", (e) => {
         const boton = e.target.closest("button[data-accion]");
         if (!boton) return;
@@ -26,8 +31,7 @@ export async function init() {
         else if (boton.dataset.accion === "eliminar") eliminar(id);
     });
 
-    await llenarCategorias();
-    await cargar();
+    await Promise.all([llenarCategorias(), cargar()]);
 }
 
 async function cargar() {
@@ -108,12 +112,15 @@ async function guardar() {
     const precio = document.getElementById("campo-precio").value;
     const minimo = document.getElementById("campo-minimo").value;
 
+    const vencimiento = document.getElementById("campo-vencimiento").value;
+    const esNuevo = !id;
     const error = v.primerError([
         v.requerido(nombre, "Nombre"),
         document.getElementById("campo-categoria").value ? null : "Debes seleccionar una categoría.",
         v.noNegativo(cantidad, "Cantidad"),
         v.noNegativo(precio, "Precio"),
         v.noNegativo(minimo, "Stock mínimo"),
+        esNuevo ? v.fechaNoPasada(vencimiento) : null,
     ]);
     if (error) {
         const alerta = document.getElementById("error-form");

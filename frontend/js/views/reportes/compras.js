@@ -1,5 +1,6 @@
 import { ReportesAPI, ProveedoresAPI } from "../../api/inventario_api.js";
 import { dinero, escapar, notificar, pintarTarjetas, graficoBarras, descargarArchivo } from "../../utils/helpers.js";
+import { rangoFechas } from "../../utils/validaciones.js";
 
 let porProveedor = [];
 let grafico = null;
@@ -14,8 +15,7 @@ export async function init() {
     document.getElementById("btn-pdf").addEventListener("click", () =>
         descargarArchivo(ReportesAPI.urlExportar("compras", "pdf", filtros())));
 
-    await llenarProveedores();
-    await cargar();
+    await Promise.all([llenarProveedores(), cargar()]);
 }
 
 function filtros() {
@@ -27,8 +27,11 @@ function filtros() {
 }
 
 async function cargar() {
+    const f = filtros();
+    const errorRango = rangoFechas(f.desde, f.hasta);
+    if (errorRango) return notificar(errorRango, "danger");
     try {
-        const datos = await ReportesAPI.compras(filtros());
+        const datos = await ReportesAPI.compras(f);
         if (!document.getElementById("tabla-compras")) return;
         porProveedor = datos.por_proveedor;
         pintarResumen(datos.resumen);
