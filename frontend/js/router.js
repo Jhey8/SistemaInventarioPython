@@ -93,25 +93,30 @@ export async function navegar(nombre) {
         return navegar(ruta.redirigir);
     }
     const contenido = document.getElementById("contenido");
-    contenido.innerHTML = VELO_CARGA;
     try {
         const html = await fetch(`${ruta.html}?v=${V}`).then((r) => r.text());
-        contenido.innerHTML = html + VELO_CARGA;
+        contenido.innerHTML = html;
+        mostrarCargaEnTablas(contenido);
         const modulo = await import(`${ruta.js}?v=${V}`);
         if (modulo.init) await modulo.init();
+        contenido.querySelectorAll(".fila-cargando").forEach((f) => f.remove());
         marcarActivo(nombre);
     } catch (e) {
         contenido.innerHTML =
             `<div class="alert alert-danger">No se pudo cargar la vista: ${escapar(e.message)}</div>`;
     }
-    contenido.querySelector(".velo-carga")?.remove();
 }
 
-const VELO_CARGA = `
-    <div class="velo-carga">
-        <div class="spinner-border text-secondary" role="status"></div>
-        <div class="small mt-2 text-muted">Cargando módulo…</div>
-    </div>`;
+function mostrarCargaEnTablas(contenido) {
+    contenido.querySelectorAll("table tbody").forEach((cuerpo) => {
+        if (cuerpo.children.length) return;
+        const columnas = cuerpo.closest("table").querySelectorAll("thead th").length || 1;
+        cuerpo.innerHTML = `
+            <tr class="fila-cargando"><td colspan="${columnas}" class="text-center text-muted py-4">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>Cargando datos…
+            </td></tr>`;
+    });
+}
 
 function marcarActivo(nombre) {
     document.querySelectorAll("[data-vista]").forEach((el) => {
