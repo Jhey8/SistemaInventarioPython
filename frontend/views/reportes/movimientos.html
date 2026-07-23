@@ -1,0 +1,85 @@
+<div class="d-flex justify-content-between align-items-start mb-1">
+    <div>
+        <h1 class="h4 mb-1">Reporte - Movimientos (Kardex)</h1>
+        <p class="text-muted small mb-0">Historial de entradas, salidas y ajustes. Filtra por producto para ver su
+            kardex.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary" id="btn-excel"><i
+                class="bi bi-file-earmark-spreadsheet me-1"></i>Excel</button>
+        <button class="btn btn-sm btn-outline-secondary" id="btn-pdf"><i
+                class="bi bi-file-earmark-pdf me-1"></i>PDF</button>
+    </div>
+</div>
+
+<div id="tarjetas-movimientos" class="mt-3"></div>
+
+<div class="card mb-4">
+    <div class="card-header bg-white fw-medium"><i class="bi bi-funnel me-1"></i>Filtros</div>
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small">Producto</label>
+                <select class="form-select form-select-sm" id="f-producto">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Tipo</label>
+                <select class="form-select form-select-sm" id="f-tipo">
+                    <option value="">Todos</option>
+                    <option value="ENTRADA">Entrada</option>
+                    <option value="SALIDA">Salida</option>
+                    <option value="AJUSTE">Ajuste</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Proveedor</label>
+                <select class="form-select form-select-sm" id="f-proveedor">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Desde</label>
+                <input type="date" class="form-control form-control-sm" id="f-desde">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Hasta</label>
+                <input type="date" class="form-control form-control-sm" id="f-hasta">
+            </div>
+            <div class="col-12">
+                <button class="btn btn-marca btn-sm" id="btn-aplicar"><i class="bi bi-search me-1"></i>Aplicar</button>
+                <button class="btn btn-outline-secondary btn-sm" id="btn-limpiar">Limpiar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-pie-chart me-1"></i>Distribución por tipo</div>
+    <div class="card-body d-flex justify-content-center">
+        <canvas id="grafico-movimientos" style="max-height: 240px;"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-list-ul me-1"></i>Detalle de movimientos</div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Producto</th>
+                    <th class="text-center">Tipo</th>
+                    <th>Motivo</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-center">Stock</th>
+                    <th>Proveedor</th>
+                    <th class="text-end">Subtotal</th>
+                    <th>Usuario</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-movimientos"></tbody>
+        </table>
+    </div>
+</div>

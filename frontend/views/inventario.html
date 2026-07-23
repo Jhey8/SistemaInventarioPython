@@ -1,0 +1,137 @@
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h1 class="h4 mb-0">Inventario</h1>
+</div>
+<p class="text-muted small mb-3">Registra entradas, salidas y ajustes de cada producto.</p>
+
+<div id="tarjetas-inventario"></div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-boxes me-1"></i>Productos</span>
+        <div class="input-group input-group-buscar" style="max-width: 360px;">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="buscador-inv" placeholder="Buscar por nombre o categoría">
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="text-end">Stock actual</th>
+                    <th class="text-end">Stock mín.</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo-inventario"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-movimiento" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h6">Registrar movimiento</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-none" id="error-mov"></div>
+
+                <div class="d-flex justify-content-between align-items-center p-2 mb-3 rounded"
+                     style="background-color: var(--papel);">
+                    <div>
+                        <div class="small text-muted">Producto</div>
+                        <div class="fw-semibold" id="mov-nombre-producto">—</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small text-muted">Stock actual</div>
+                        <div class="fw-semibold" id="mov-stock-actual">0</div>
+                    </div>
+                </div>
+                <input type="hidden" id="mov-id-producto">
+
+                <form id="form-movimiento">
+                    <div class="btn-group w-100 mb-3" role="group">
+                        <input type="radio" class="btn-check" name="tipo" id="tipo-entrada" value="ENTRADA" checked>
+                        <label class="btn btn-outline-success" for="tipo-entrada">Entrada</label>
+                        <input type="radio" class="btn-check" name="tipo" id="tipo-salida" value="SALIDA">
+                        <label class="btn btn-outline-danger" for="tipo-salida">Salida</label>
+                        <input type="radio" class="btn-check" name="tipo" id="tipo-ajuste" value="AJUSTE">
+                        <label class="btn btn-outline-warning" for="tipo-ajuste">Ajuste</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label" id="label-cantidad">Cantidad</label>
+                            <input type="number" min="1" class="form-control" id="mov-cantidad" value="1">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Motivo</label>
+                            <select class="form-select" id="mov-motivo"></select>
+                        </div>
+                    </div>
+
+                    <div id="bloque-entrada">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Proveedor</label>
+                                <select class="form-select" id="mov-proveedor"></select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Precio compra</label>
+                                <input type="number" min="0" step="0.01" class="form-control" id="mov-precio">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="bloque-documento" class="mb-3">
+                        <label class="form-label" id="label-documento">N° documento</label>
+                        <input type="text" class="form-control" id="mov-documento" placeholder="F001-123">
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label">Observación <span class="text-muted small">(opcional)</span></label>
+                        <input type="text" class="form-control" id="mov-observacion">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-marca" id="btn-guardar-mov">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-historial" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h6">Historial: <span id="hist-nombre-producto"></span></h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th class="text-center">Tipo</th>
+                                <th>Motivo</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-center">Stock</th>
+                                <th>Proveedor</th>
+                                <th>Usuario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-historial"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
