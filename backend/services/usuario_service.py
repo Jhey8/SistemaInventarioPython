@@ -3,16 +3,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models.usuario import crear_usuario
 from repositories.usuario_repository import UsuarioRepository
 from repositories.perfil_repository import PerfilRepository
+from repositories.modulo_repository import ModuloRepository
 from exceptions.errores import (
     UsuarioNoEncontradoError, DatosInvalidosError, CredencialesInvalidasError,
 )
 
 LONGITUD_MINIMA_CLAVE = 4
+# Un perfil es "administrador" si puede gestionar usuarios o perfiles.
+RUTAS_ADMIN = ("usuarios", "perfiles")
 
 class UsuarioService:
-    def __init__(self, repositorio=None, perfil_repo=None):
+    def __init__(self, repositorio=None, perfil_repo=None, modulo_repo=None):
         self.repositorio = repositorio or UsuarioRepository()
         self.perfil_repo = perfil_repo or PerfilRepository()
+        self.modulo_repo = modulo_repo or ModuloRepository()
 
     def listar_usuarios(self, solo_activos=False):
         return self.repositorio.listar(solo_activos)
@@ -49,20 +53,33 @@ class UsuarioService:
         return self.repositorio.actualizar(usuario, clave_hash)
 
     def eliminar_usuario(self, id_usuario, id_usuario_actual=None):
-        self.obtener_usuario(id_usuario)
+        usuario = self.obtener_usuario(id_usuario)
         self._impedir_sobre_si_mismo(id_usuario, id_usuario_actual,
                                      "No puedes eliminar tu propio usuario.")
+        if self._es_perfil_admin(usuario.id_perfil):
+            raise DatosInvalidosError("No puedes eliminar a otro usuario administrador.")
         self.repositorio.eliminar(id_usuario)
 
     def cambiar_estado_usuario(self, id_usuario, estado, id_usuario_actual=None):
         if int(estado) not in (0, 1):
             raise DatosInvalidosError("Estado inválido.")
-        self.obtener_usuario(id_usuario)
+        usuario = self.obtener_usuario(id_usuario)
 
         if int(estado) == 0:
             self._impedir_sobre_si_mismo(id_usuario, id_usuario_actual,
                                          "No puedes desactivar tu propio usuario.")
+            if self._es_perfil_admin(usuario.id_perfil):
+                raise DatosInvalidosError("No puedes desactivar a otro usuario administrador.")
         self.repositorio.cambiar_estado(id_usuario, estado)
+
+    def _es_perfil_admin(self, id_perfil):
+        if not id_perfil:
+            return False
+        perfil = self.perfil_repo.obtener(int(id_perfil))
+        if perfil is None:
+            return False
+        ids_admin = {m.id_modulo for m in self.modulo_repo.listar_todos() if m.ruta in RUTAS_ADMIN}
+        return any(mod in perfil.modulos for mod in ids_admin)
 
     def actualizar_datos_propios(self, id_usuario, datos):
         actual = self.obtener_usuario(id_usuario)

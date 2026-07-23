@@ -24,6 +24,20 @@ class ProductoRepository:
             cursor.close()
             conn.close()
 
+    def contar_por_categoria(self, categoria_id):
+        """Cuenta los productos no eliminados de una categoría."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) FROM productos WHERE categoria_id = %s AND estado <> 2",
+                (categoria_id,),
+            )
+            return cursor.fetchone()[0]
+        finally:
+            cursor.close()
+            conn.close()
+
     def obtener(self, id):
         conn = get_connection()
         try:

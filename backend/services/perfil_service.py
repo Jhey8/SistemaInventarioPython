@@ -4,6 +4,8 @@ from repositories.modulo_repository import ModuloRepository
 from exceptions.errores import PerfilNoEncontradoError, DatosInvalidosError
 
 RUTA_GESTION = "perfiles"
+# Un perfil es "administrador" si puede gestionar usuarios o perfiles.
+RUTAS_ADMIN = ("usuarios", "perfiles")
 
 class PerfilService:
     def __init__(self, repositorio=None, modulo_repo=None):
@@ -45,17 +47,17 @@ class PerfilService:
         return self.repositorio.actualizar(perfil)
 
     def eliminar_perfil(self, id_perfil):
-        self._verificar_no_es_ultimo_gestor(id_perfil,
-            "No puedes eliminar el único perfil que gestiona los módulos.")
+        perfil = self.obtener_perfil(id_perfil)
+        if self._es_admin(perfil):
+            raise DatosInvalidosError("No puedes eliminar un perfil administrador.")
         self.repositorio.eliminar(id_perfil)
 
     def cambiar_estado_perfil(self, id_perfil, estado):
         if int(estado) not in (0, 1):
             raise DatosInvalidosError("Estado inválido.")
-        self.obtener_perfil(id_perfil)
-        if int(estado) == 0:
-            self._verificar_no_es_ultimo_gestor(id_perfil,
-                "No puedes desactivar el único perfil que gestiona los módulos.")
+        perfil = self.obtener_perfil(id_perfil)
+        if int(estado) == 0 and self._es_admin(perfil):
+            raise DatosInvalidosError("No puedes desactivar un perfil administrador.")
         self.repositorio.cambiar_estado(id_perfil, estado)
 
     def _id_modulo_gestion(self):
@@ -70,9 +72,6 @@ class PerfilService:
             for p in self.repositorio.listar(solo_activos=True)
         )
 
-    def _verificar_no_es_ultimo_gestor(self, id_perfil, mensaje):
-        perfil = self.obtener_perfil(id_perfil)
-        id_gestion = self._id_modulo_gestion()
-        if id_gestion is not None and id_gestion in perfil.modulos:
-            if not self._otros_gestionan(id_perfil, id_gestion):
-                raise DatosInvalidosError(mensaje)
+    def _es_admin(self, perfil):
+        ids_admin = {m.id_modulo for m in self.modulo_repo.listar_todos() if m.ruta in RUTAS_ADMIN}
+        return any(mod in perfil.modulos for mod in ids_admin)
