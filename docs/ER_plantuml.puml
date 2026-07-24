@@ -1,0 +1,107 @@
+@startuml Sistema_Inventario_ER
+' Diagrama Entidad-Relacion - Sistema de Inventario
+hide circle
+skinparam linetype ortho
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam entity {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6FED
+  ArrowColor #444444
+}
+
+entity "PERFILES" as perfiles {
+  *id_perfil : INT <<PK>>
+  --
+  nombre : VARCHAR(80)
+  descripcion : VARCHAR(200)
+  estado : TINYINT
+}
+
+entity "USUARIOS" as usuarios {
+  *id_usuario : INT <<PK>>
+  --
+  usuario : VARCHAR(80)
+  clave : VARCHAR(255)
+  nombre : VARCHAR(150)
+  correo : VARCHAR(150)
+  #id_perfil : INT <<FK>>
+  estado : TINYINT
+}
+
+entity "MODULOS" as modulos {
+  *id_modulo : INT <<PK>>
+  --
+  nombre : VARCHAR(80)
+  icono : VARCHAR(60)
+  ruta : VARCHAR(60)
+  orden : INT
+  estado : TINYINT
+}
+
+entity "PERFIL_MODULO" as perfil_modulo {
+  *id_perfil : INT <<PK>> <<FK>>
+  *id_modulo : INT <<PK>> <<FK>>
+}
+
+entity "CATEGORIAS" as categorias {
+  *id : INT <<PK>>
+  --
+  nombre : VARCHAR(80)
+  descripcion : VARCHAR(200)
+  estado : TINYINT
+}
+
+entity "PRODUCTOS" as productos {
+  *id : INT <<PK>>
+  --
+  nombre : VARCHAR(120)
+  #categoria_id : INT <<FK>>
+  cantidad : INT
+  precio : DECIMAL(10,2)
+  stock_minimo : INT
+  fecha_vencimiento : DATE
+  estado : TINYINT
+}
+
+entity "PROVEEDORES" as proveedores {
+  *id_proveedor : INT <<PK>>
+  --
+  nombre_proveedor : VARCHAR(200)
+  ruc : VARCHAR(11)
+  representante : VARCHAR(150)
+  telefono : VARCHAR(20)
+  correo : VARCHAR(150)
+  direccion : VARCHAR(250)
+  estado : TINYINT
+  fecha_registro : DATETIME
+}
+
+entity "MOVIMIENTOS" as movimientos {
+  *id : INT <<PK>>
+  --
+  #id_producto : INT <<FK>>
+  #id_proveedor : INT <<FK>>
+  #id_usuario : INT <<FK>>
+  tipo_movimiento : VARCHAR(20)
+  motivo : VARCHAR(50)
+  cantidad : INT
+  stock_anterior : INT
+  stock_nuevo : INT
+  numero_documento : VARCHAR(50)
+  observacion : VARCHAR(255)
+  precio_compra : DECIMAL(10,2)
+  subtotal : DECIMAL(10,2)
+  fecha : DATETIME
+}
+
+' ===== Relaciones =====
+perfiles ||--o{ usuarios        : "tiene"
+perfiles ||--o{ perfil_modulo   : "permite"
+modulos  ||--o{ perfil_modulo   : "se asigna"
+categorias ||--o{ productos     : "agrupa"
+productos  ||--o{ movimientos   : "registra"
+proveedores |o--o{ movimientos  : "abastece"
+usuarios    |o--o{ movimientos  : "ejecuta"
+
+@enduml
